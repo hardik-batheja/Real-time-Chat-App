@@ -14,6 +14,8 @@ SECRET_KEY = '9nneu#^7_aai*(#(6_qiihu-^k-+%a86&vjh=_i9#(c4^8s51n'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+TEMPLATE_DIR=os.path.join(BASE_DIR,'templates')
+
 
 
 # Application definition
@@ -47,7 +49,7 @@ ROOT_URLCONF = 'justchat.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR,],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -59,6 +61,23 @@ TEMPLATES = [
         },
     },
 ]
+
+MIDDLEWARE_CLASSES = (
+    
+    'chat.middleware.activeuser_middleware.ActiveUserMiddleware',
+    
+)
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'default-cache'
+    }
+}
+USER_ONLINE_TIMEOUT = 300
+USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+
 
 WSGI_APPLICATION = 'justchat.wsgi.application'
 ASGI_APPLICATION = "justchat.routing.application"
@@ -119,6 +138,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+MEDIA_ROOT=os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'
+
 
 
 # Static files (CSS, JavaScript, Images)

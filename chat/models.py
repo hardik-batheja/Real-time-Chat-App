@@ -2,9 +2,30 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import Group
 from chat.middileware import RequestMiddleware
+from justchat import settings
+from django.core.cache import cache 
+import datetime
+
 
 
 User = get_user_model()
+class UserProfile(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
+
+    def last_seen(self):
+        return cache.get('seen_%s' % self.user.username)
+
+    def online(self):
+        if self.last_seen():
+            now = datetime.datetime.now()
+            if now > self.last_seen() + datetime.timedelta(
+                         seconds=settings.USER_ONLINE_TIMEOUT):
+                return False
+            else:
+                return True
+        else:
+            return False
+
 class ChatGroup(Group):
     """ extend Group model to add extra info"""
     description = models.TextField(blank=True, help_text="description of the group")
@@ -31,9 +52,13 @@ class ChatGroup(Group):
 
 class Message(models.Model):
     author = models.ForeignKey(User, related_name='author_messages', on_delete=models.CASCADE)
-    content = models.TextField()
+    content = models.TextField(default=None,null=True,blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     chatgroup=models.ForeignKey(ChatGroup,on_delete=models.CASCADE)
+    seen =models.BooleanField(default=False,null=True,blank=True)
+    blob=models.FileField(default=None,null=True)
+
+    
 
     def __str__(self):
         return self.author.username

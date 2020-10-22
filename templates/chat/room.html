@@ -1,0 +1,304 @@
+{% load static %}
+{% load filters %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+    <script src="https://use.typekit.net/hoy3lrg.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <style>
+      .file-input input {
+  display: none;
+}
+    </style>
+  </head>
+
+<body>
+  <div id="frame">
+    <div id="sidepanel">
+      <div id="profile">
+        <div class="wrap">
+          <img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
+          <p>{{sender.username}}</p>
+          <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
+          <div id="status-options">
+            <ul>
+              <!-- <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
+              <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
+              <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
+              <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>-->
+
+              {% with request.user.profile as profile %}
+
+            <table>
+              <tr><th>Last Seen</th><td>{% if profile.last_seen %}{{ profile.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
+             <tr><th>Online</th><td>{{ profile.online }}</td></tr>
+           </table>
+
+            {% endwith %}
+            </ul> 
+          </div>
+          <div id="expanded">
+            <label for="twitter"><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></label>
+            <input name="twitter" type="text" value="mikeross" />
+            <label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
+            <input name="twitter" type="text" value="ross81" />
+            <label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
+            <input name="twitter" type="text" value="mike.ross" />
+          </div>
+        </div>
+      </div>
+      <div id="search">
+        <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
+        <input type="text" placeholder="Search contacts..." />
+      </div>
+      <div id="contacts">
+        <ul>
+          <!-- <li class="contact">
+            <div class="wrap">
+              <span class="contact-status online"></span>
+              <img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+              <div class="meta">
+                <p class="name">Louis Litt</p>
+                <p class="preview">You just got LITT up, Mike.</p>
+              </div>
+            </div>
+          </li> -->
+          {% for group in groups_participated %}
+          <li class="contact active" id="group-{{group.id}}"onclick="redirect('{{group.get_absolute_url}}')">
+            <div class="wrap">
+              <span class="contact-status busy"></span>
+              <img src="{{ group.icon.url }}" alt="" />
+              <div class="meta">
+                <p class="name">{{ group.get_group_receiver }}</p>
+                <p class="preview">{{ group.description |title}}</p>
+              </div>
+            </div>
+          </li>
+         
+          {% endfor %}
+        </ul>
+        <script>
+          $("li.contact").click(function(e){
+     $(this).addClass("active").siblings().removeClass("active")
+          })
+       </script>
+      </div>
+      <div id="bottom-bar">
+        <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add contact</span></button>
+        <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="contact-profile">
+        <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+        <p>{{ receiver.username }}</p>
+        <div class="social-media">
+          <i class="fa fa-facebook" aria-hidden="true"></i>
+          <i class="fa fa-twitter" aria-hidden="true"></i>
+          <i class="fa fa-instagram" aria-hidden="true"></i>
+        </div>
+      </div>
+      <div id="message" class="messages">
+        <ul id="chat-log">
+         
+        </ul>
+      </div>
+      <div class="message-input">
+        <div class="wrap">
+        <input id="chat-message-input" type="text" placeholder="Write your message..." />
+        <i id="attachment_id" data-toggle="modal" data-target=".bd-example-modal-sm" class="fa fa-paperclip attachment" ></i>
+        <button id="chat-message-submit" class="submit">
+          <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="mySmallModalLabel">Select attachment</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <input id="file" class="form-control-file" type="file">
+        <input id="chat-text-input" type="text" placeholder="Write your message..." />
+
+        <button id="chat-file-submit" class="submit"> <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+        </div>
+          
+        </div>
+    </div>
+  </div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="{% static 'main.js' %}"></script>
+<script src="{% static 'reconnecting-websocket.js' %}"></script>
+
+<script>
+
+// $("#attachment_id").click(function(){
+//   $("#file").click();
+// });
+
+
+    var roomName = "{{ chatgroup.id }}" ;
+    var username = "{{ request.user.username }}" ;
+    var cart={};
+    var filename='';
+
+    var chatSocket = new ReconnectingWebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+
+
+
+
+
+
+document.querySelector('#chat-file-submit').onclick = function(e) {
+  var file = document.getElementById('file').files[0];
+        document.cookie ='cart=' + JSON.stringify({}) + ";domain=;path=/"
+        cart['name']=file.name
+        document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+        chatSocket.send(file.name);
+        chatSocket.binaryType = "blob";
+        chatSocket.send(file);
+  // var messageInputDom = document.getElementById('chat-text-input');
+  // var text = messageInputDom.value;
+  // filename=null
+  // filename=file.name
+      
+ };
+
+
+        function redirect(url) {
+            window.location = url;
+        }
+        
+    chatSocket.onopen = function(e) {
+      fetchMessages();
+
+    }
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        if (data['command'] === 'messages') {
+          for (let i=0; i<data['messages'].length; i++) {
+            createMessage(data['messages'][i]);
+           
+          }
+        } else if (data['command'] === 'new_message'){
+          createMessage(data['message']);
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.log('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        var messageInputDom = document.getElementById('chat-message-input');
+        var message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'command': 'new_message',
+            'message': message,
+            'from': username
+        }));
+
+        messageInputDom.value = '';
+    };
+
+    function fetchMessages() {
+      chatSocket.send(JSON.stringify({'command': 'fetch_messages' }));
+    }
+
+    function createMessage(data) {
+
+      var author = data['author'];
+      var msgListTag = document.createElement('li');
+      var imgTag = document.createElement('img')
+      imgTag.classList.add('profileImg');
+      var i=document.createElement('i')
+      i.classList.add('fa', 'fa-file-text', 'fa-7x');
+      
+      var pTag = document.createElement('p');
+      var blobTag = document.createElement('img');
+      var aTag = document.createElement('a');
+      var imganchor= document.createElement('a');
+      blobTag.classList.add('attImg');
+      
+      
+      
+      imgTag.src = 'http://emilcarlsson.se/assets/mikeross.png';
+      msgListTag.appendChild(imgTag);
+      filename=''
+      if(data.blob != 'null')
+      {
+      filename=data.blob.substring(data.blob.lastIndexOf('/')+1);
+      var ext = filename.substring(filename.lastIndexOf('.')+1);
+      console.log(filename+' '+ext)
+      if (['jpg','jpeg','png'].indexOf(ext)>=0)
+      {
+        
+      blobTag.src='http://127.0.0.1:8000'+data.blob
+      imganchor.href='http://127.0.0.1:8000'+data.blob
+      imganchor.appendChild(blobTag)
+      msgListTag.appendChild(imganchor);
+      }
+      else{
+          aTag.href='http://127.0.0.1:8000'+data.blob
+        aTag.textContent=filename;
+        aTag.appendChild(i)
+
+      msgListTag.appendChild(aTag);
+      }
+      
+      }else{
+        pTag.textContent = data.content;
+        msgListTag.appendChild(pTag);
+
+      }
+      
+      if (author === username) {
+        msgListTag.className = 'sent';
+     
+      } else {
+        
+        msgListTag.className = 'replies';
+       
+      }
+     
+      document.querySelector('#chat-log').appendChild(msgListTag);
+      var objDiv = document.getElementById("message");
+        objDiv.scrollTop = objDiv.scrollHeight;
+     
+     
+    }
+
+   
+
+   
+
+</script>
+</body>
+
+</html>
