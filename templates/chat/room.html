@@ -23,13 +23,13 @@
         <div class="wrap">
           <img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
           <p>{{sender.username}}</p>
-          <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
+          <!-- <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i> -->
           <div id="status-options">
             <ul>
               <!-- <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
               <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
               <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
-              <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>-->
+              <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li> -->
 
               {% with request.user.profile as profile %}
 
@@ -41,20 +41,20 @@
             {% endwith %}
             </ul> 
           </div>
-          <div id="expanded">
+          <!-- <div id="expanded">
             <label for="twitter"><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></label>
             <input name="twitter" type="text" value="mikeross" />
             <label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
             <input name="twitter" type="text" value="ross81" />
             <label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
             <input name="twitter" type="text" value="mike.ross" />
-          </div>
+          </div> -->
         </div>
       </div>
-      <div id="search">
+      <!-- <div id="search">
         <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
         <input type="text" placeholder="Search contacts..." />
-      </div>
+      </div> -->
       <div id="contacts">
         <ul>
           <!-- <li class="contact">
@@ -87,20 +87,20 @@
           })
        </script>
       </div>
-      <div id="bottom-bar">
+      <!-- <div id="bottom-bar">
         <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add contact</span></button>
         <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
-      </div>
+      </div> -->
     </div>
     <div class="content">
       <div class="contact-profile">
         <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
         <p>{{ receiver.username }}</p>
-        <div class="social-media">
+        <!-- <div class="social-media">
           <i class="fa fa-facebook" aria-hidden="true"></i>
           <i class="fa fa-twitter" aria-hidden="true"></i>
           <i class="fa fa-instagram" aria-hidden="true"></i>
-        </div>
+        </div> -->
       </div>
       <div id="message" class="messages">
         <ul id="chat-log">
@@ -235,12 +235,17 @@ document.querySelector('#chat-file-submit').onclick = function(e) {
 
       var author = data['author'];
       var msgListTag = document.createElement('li');
-      var imgTag = document.createElement('img')
+      var imgTag = document.createElement('img');
       imgTag.classList.add('profileImg');
+      var divp=document.createElement('div');
+      var nameTag = document.createElement('p');
       var i=document.createElement('i')
       i.classList.add('fa', 'fa-file-text', 'fa-7x');
       
+      
       var pTag = document.createElement('p');
+      pTag.classList.add("mesp");
+      nameTag.classList.add("timep");
       var blobTag = document.createElement('img');
       var aTag = document.createElement('a');
       var imganchor= document.createElement('a');
@@ -250,6 +255,7 @@ document.querySelector('#chat-file-submit').onclick = function(e) {
       
       imgTag.src = 'http://emilcarlsson.se/assets/mikeross.png';
       msgListTag.appendChild(imgTag);
+      msgListTag.appendChild(divp);
       filename=''
       if(data.blob != 'null')
       {
@@ -274,19 +280,19 @@ document.querySelector('#chat-file-submit').onclick = function(e) {
       
       }else{
         pTag.textContent = data.content;
-        msgListTag.appendChild(pTag);
+        divp.appendChild(pTag);
 
       }
       
       if (author === username) {
-        msgListTag.className = 'sent';
-     
-      } else {
-        
+        msgListTag.className = 'sent'; 
+     }
+      else {
         msgListTag.className = 'replies';
        
       }
-     
+      nameTag.textContent = data.timestamp.substring(11, 16);
+      divp.appendChild(nameTag);
       document.querySelector('#chat-log').appendChild(msgListTag);
       var objDiv = document.getElementById("message");
         objDiv.scrollTop = objDiv.scrollHeight;
