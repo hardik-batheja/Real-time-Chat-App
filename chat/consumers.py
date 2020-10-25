@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-
+from channels.db import database_sync_to_async
 import json
 from .models import *
 import sys
 from chat.utils import * 
-
+from django.template.loader import render_to_string
 
 
 
@@ -23,6 +23,18 @@ class ChatConsumer(WebsocketConsumer):
             'messages': self.messages_to_json(messages)
         }
         self.send_message(content)
+    
+    def get_group_receiver(self,obj):
+        users=User.objects.filter(groups__name=obj.name)
+        user = self.scope['user']
+        
+        if user.username == users[0].username:
+            sender=users[0]
+            receiver=users[1]
+        else:
+            sender=users[1]
+            receiver=users[0]
+        return receiver
 
     def new_message(self, data):
         author = data['from']
@@ -75,7 +87,30 @@ class ChatConsumer(WebsocketConsumer):
         'fetch_messages': fetch_messages,
         'new_message': new_message
     }
-
+    
+    def update_user_status(self, user, status):
+        user=UserProfile.objects.get(user = user)
+        #print(user)
+        user.status=status
+        user.save()
+        return user
+    
+    def send_status (self):
+        chatgroup=ChatGroup.objects.get(id=self.room_name)
+        receiver=self.get_group_receiver(chatgroup)
+        flag=receiver.profile.status
+        print(flag)
+        html_status = render_to_string("status.html", {'flag': flag})
+        message={
+            'html_status':html_status
+        }
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
@@ -83,24 +118,35 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        
         self.accept()
+        user = self.scope ['user']
+        if user.is_authenticated:
+            self.update_user_status(user, True)
+            self.send_status ()
 
     def disconnect(self, close_code):
+        user = self.scope ['user']
+        if user.is_authenticated:
+            print("xyz")
+            self.update_user_status(user, False)
+            self.send_status ()
+
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
-
+       
     def receive(self,text_data=None,bytes_data=None):
         data={}
         filename=None
-        print(text_data)
+        #print(text_data)
         if text_data:
             if '.' in text_data:
                 self.scope['session']['filename']=text_data
                 self.scope['session'].save()
             else:
-                print(text_data)
+                #print(text_data)
                 data = json.loads(text_data)
                 data['blob']=bytes_data
                 self.commands[data['command']](self, data)

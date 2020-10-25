@@ -10,3 +10,10 @@ class ChatGroupAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
 
 admin.site.register(ChatGroup, ChatGroupAdmin)
+class ProfileAdmin(admin.ModelAdmin):
+    """ enable Chart Group admin """
+    list_display = ('id', 'user','status')
+    list_filter = ('id', 'user','status')
+
+admin.site.register(UserProfile,ProfileAdmin)
+

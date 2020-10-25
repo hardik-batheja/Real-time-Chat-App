@@ -4,6 +4,9 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .models import *
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.dispatch import receiver    
+
 
 import json
 
@@ -53,6 +56,15 @@ def room(request, group_id):
     else:
         return HttpResponseRedirect("unauthorized")
 
+# @receiver(user_logged_in)
+# def got_online(sender, user, request, **kwargs):    
+#     user.profile.is_online = True
+#     user.profile.save()
+
+# @receiver(user_logged_out)
+# def got_offline(sender, user, request, **kwargs):   
+#     user.profile.is_online = False
+#     user.profile.save()
 
 # def room(request, room_name):
 #     return render(request, 'chat/room.html', {

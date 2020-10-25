@@ -62,20 +62,21 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE_CLASSES = (
+# MIDDLEWARE_CLASSES = (
     
-    'chat.middleware.activeuser_middleware.ActiveUserMiddleware',
+#     'middleware.activeuser_middleware.ActiveUserMiddleware',
     
-)
+# )
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'default-cache'
-    }
-}
-USER_ONLINE_TIMEOUT = 300
-USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+# CACHES = {
+#         'default': {
+#             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#             'LOCATION': '127.0.0.1:11211',              
+#         }
+#     }
+
+# USER_ONLINE_TIMEOUT = 300
+# USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
 
 
 

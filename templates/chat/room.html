@@ -26,19 +26,12 @@
           <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
           <div id="status-options">
             <ul>
-              <!-- <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
+              <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
               <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
               <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
-              <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>-->
+              <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>
 
-              {% with request.user.profile as profile %}
-
-            <table>
-              <tr><th>Last Seen</th><td>{% if profile.last_seen %}{{ profile.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
-             <tr><th>Online</th><td>{{ profile.online }}</td></tr>
-           </table>
-
-            {% endwith %}
+              
             </ul> 
           </div>
           <div id="expanded">
@@ -95,7 +88,8 @@
     <div class="content">
       <div class="contact-profile">
         <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-        <p>{{ receiver.username }}</p>
+        <p>{{ receiver.username }}</p> 
+       <div id="mystatus"></div>
         <div class="social-media">
           <i class="fa fa-facebook" aria-hidden="true"></i>
           <i class="fa fa-twitter" aria-hidden="true"></i>
@@ -195,6 +189,11 @@ document.querySelector('#chat-file-submit').onclick = function(e) {
 
     chatSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
+        if('html_status' in data)
+        {
+          $('#mystatus'). html (data.html_status)
+        }
+        else{
         if (data['command'] === 'messages') {
           for (let i=0; i<data['messages'].length; i++) {
             createMessage(data['messages'][i]);
@@ -202,6 +201,7 @@ document.querySelector('#chat-file-submit').onclick = function(e) {
           }
         } else if (data['command'] === 'new_message'){
           createMessage(data['message']);
+        }
         }
     };
 

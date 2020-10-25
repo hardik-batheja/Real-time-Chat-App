@@ -11,21 +11,9 @@ import datetime
 User = get_user_model()
 class UserProfile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
+    status=models.BooleanField(default=False,null=True,blank=True)
 
-    def last_seen(self):
-        return cache.get('seen_%s' % self.user.username)
-
-    def online(self):
-        if self.last_seen():
-            now = datetime.datetime.now()
-            if now > self.last_seen() + datetime.timedelta(
-                         seconds=settings.USER_ONLINE_TIMEOUT):
-                return False
-            else:
-                return True
-        else:
-            return False
-
+    
 class ChatGroup(Group):
     """ extend Group model to add extra info"""
     description = models.TextField(blank=True, help_text="description of the group")
