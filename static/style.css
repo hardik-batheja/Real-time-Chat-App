@@ -582,6 +582,9 @@ body {
 #frame .content .messages ul li.sent p.timep {
   float: right;
 }
+#frame .content .messages ul li.sent i {
+  float: right;
+}
 #frame .content .messages ul li.replies img {
   margin: 6px 0 0 8px;
 }

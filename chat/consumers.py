@@ -33,11 +33,10 @@ class ChatConsumer(WebsocketConsumer):
             sender=users[0]
             receiver=users[1]
         else:
-            
             sender=users[1]
             receiver=users[0]
             print(receiver.username)
-        return receiver
+        return sender
 
     def new_message(self, data):
         author = data['from']
@@ -100,28 +99,9 @@ class ChatConsumer(WebsocketConsumer):
     
     def send_status_connect(self):
         chatgroup=ChatGroup.objects.get(id=self.room_name)
-        receiver=self.get_group_receiver(chatgroup)
-        flag=receiver.profile.status
-        print(flag)
-        print(receiver.username)
+        sender=self.get_group_receiver(chatgroup)
+        flag=sender.profile.status
         html_status = render_to_string("status.html", {'flag': flag})
-        message={
-            'html_status':html_status
-        }
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message
-            }
-        )
-    def send_status_disconnect(self):
-        chatgroup=ChatGroup.objects.get(id=self.room_name)
-        receiver=self.get_group_receiver(chatgroup)
-        flag=receiver.profile.status
-        print(flag)
-        print(receiver.username)
-        html_status = render_to_string("disconnect.html", {'flag': flag})
         message={
             'html_status':html_status
         }
@@ -153,9 +133,8 @@ class ChatConsumer(WebsocketConsumer):
         )
         user = self.scope ['user']
         if user.is_authenticated:
-            print("disconnect")
             self.update_user_status(user, False)
-            self.send_status_disconnect()
+            self.send_status_connect()
     def receive(self,text_data=None,bytes_data=None):
         data={}
         filename=None
