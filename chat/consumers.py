@@ -1,11 +1,8 @@
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-<<<<<<< HEAD
 from channels.db import database_sync_to_async
-=======
 from django.utils import timezone
->>>>>>> 0f43918c955c6ab9792a15248e764a6d9f4fe27c
 import json
 from .models import *
 import sys
@@ -36,8 +33,10 @@ class ChatConsumer(WebsocketConsumer):
             sender=users[0]
             receiver=users[1]
         else:
+            
             sender=users[1]
             receiver=users[0]
+            print(receiver.username)
         return receiver
 
     def new_message(self, data):
@@ -99,12 +98,30 @@ class ChatConsumer(WebsocketConsumer):
         user.save()
         return user
     
-    def send_status (self):
+    def send_status_connect(self):
         chatgroup=ChatGroup.objects.get(id=self.room_name)
         receiver=self.get_group_receiver(chatgroup)
         flag=receiver.profile.status
         print(flag)
+        print(receiver.username)
         html_status = render_to_string("status.html", {'flag': flag})
+        message={
+            'html_status':html_status
+        }
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
+    def send_status_disconnect(self):
+        chatgroup=ChatGroup.objects.get(id=self.room_name)
+        receiver=self.get_group_receiver(chatgroup)
+        flag=receiver.profile.status
+        print(flag)
+        print(receiver.username)
+        html_status = render_to_string("disconnect.html", {'flag': flag})
         message={
             'html_status':html_status
         }
@@ -127,20 +144,18 @@ class ChatConsumer(WebsocketConsumer):
         user = self.scope ['user']
         if user.is_authenticated:
             self.update_user_status(user, True)
-            self.send_status ()
+            self.send_status_connect()
 
     def disconnect(self, close_code):
-        user = self.scope ['user']
-        if user.is_authenticated:
-            print("xyz")
-            self.update_user_status(user, False)
-            self.send_status ()
-
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
-       
+        user = self.scope ['user']
+        if user.is_authenticated:
+            print("disconnect")
+            self.update_user_status(user, False)
+            self.send_status_disconnect()
     def receive(self,text_data=None,bytes_data=None):
         data={}
         filename=None
