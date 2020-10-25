@@ -5,7 +5,7 @@ from chat.middileware import RequestMiddleware
 from justchat import settings
 from django.core.cache import cache 
 import datetime
-
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -41,7 +41,7 @@ class ChatGroup(Group):
 class Message(models.Model):
     author = models.ForeignKey(User, related_name='author_messages', on_delete=models.CASCADE)
     content = models.TextField(default=None,null=True,blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=timezone.now)
     chatgroup=models.ForeignKey(ChatGroup,on_delete=models.CASCADE)
     seen =models.BooleanField(default=False,null=True,blank=True)
     blob=models.FileField(default=None,null=True)

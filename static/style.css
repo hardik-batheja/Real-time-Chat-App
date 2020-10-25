@@ -541,8 +541,8 @@ body {
 }
 #frame .content .messages {
   height: auto;
-  min-height: calc(100% - 93px);
-  max-height: calc(100% - 93px);
+  min-height: calc(100% - 150px);
+  max-height: calc(100% - 150px);
   overflow-y: scroll;
   overflow-x: hidden;
   width: 100%;
@@ -572,19 +572,25 @@ body {
 }
 #frame .content .messages ul li.sent img {
   margin: 6px 8px 0 0;
+  float: right;
 }
-#frame .content .messages ul li.sent p {
+#frame .content .messages ul li.sent .mesp {
   background: #435f7a;
   color: #f5f5f5;
+  float: right;
+}
+#frame .content .messages ul li.sent p.timep {
+  float: right;
 }
 #frame .content .messages ul li.replies img {
-  float: right;
   margin: 6px 0 0 8px;
 }
-#frame .content .messages ul li.replies p {
+#frame .content .messages ul li.replies p.mesp {
   background: #f5f5f5;
-  float: right;
 }
+/* #frame .content .messages ul li.replies p.timep {
+  background: #f5f5f5;
+} */
 #frame .content .messages ul li .profileImg {
   width: 42px;
   border-radius: 50%;
@@ -594,7 +600,7 @@ body {
   width: 300px;
   height: auto;
 }
-#frame .content .messages ul li p {
+#frame .content .messages ul li p.mesp {
   display: inline-block;
   padding: 10px 15px;
   border-radius: 20px;
@@ -622,8 +628,9 @@ body {
   border: none;
   width: calc(100% - 90px);
   padding: 11px 32px 10px 8px;
-  font-size: 1.8em;
+  font-size: 1.2em;
   color: #32465a;
+  height: 50px;
 }
 @media screen and (max-width: 735px) {
   #frame .content .message-input .wrap input {

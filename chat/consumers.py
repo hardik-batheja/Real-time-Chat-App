@@ -1,7 +1,11 @@
 from django.contrib.auth import get_user_model
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+<<<<<<< HEAD
 from channels.db import database_sync_to_async
+=======
+from django.utils import timezone
+>>>>>>> 0f43918c955c6ab9792a15248e764a6d9f4fe27c
 import json
 from .models import *
 import sys
@@ -72,14 +76,14 @@ class ChatConsumer(WebsocketConsumer):
             return {
             'author': message.author.username,
             'content': message.content,
-            'timestamp': str(message.timestamp),
+            'timestamp': str(timezone.localtime(message.timestamp)),
             'blob':message.blob.url
         }
         else:
             return {
             'author': message.author.username,
             'content': message.content,
-            'timestamp': str(message.timestamp),
+            'timestamp': str(timezone.localtime(message.timestamp)),
             'blob':'null'
         }
 
